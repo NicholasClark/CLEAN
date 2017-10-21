@@ -18,12 +18,14 @@ if(any(is.na(sigvals))) {
 		warning("NA or NaN detected, but na.rm=FALSE. Check results.")
 	}
 }
-if(max(sigvals, na.rm=TRUE) > 1) {
-	warning("sigvals > 1 detected.  Assuming that sigvals are on -log10 scale.")
-} else {
-	sigvals <- -log(sigvals, 10)
-	if(verbose) cat("converted sigvals to -log10 scale.\n")
-}
+	
+## NC - Get rid of automatic log10 normalization (this messes up my calculation for correlation values)
+#if(max(sigvals, na.rm=TRUE) > 1) {
+#	warning("sigvals > 1 detected.  Assuming that sigvals are on -log10 scale.")
+#} else {
+#	sigvals <- -log(sigvals, 10)
+#	if(verbose) cat("converted sigvals to -log10 scale.\n")
+#}
 
 ## sanity checks etc.
 if(!(is.factor(geneids) | is.numeric(geneids) | is.character(geneids))) {
