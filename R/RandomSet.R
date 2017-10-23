@@ -185,8 +185,8 @@ if(any(runRS)) {
 				if(verbose) cat("  .. Computing one-sided p-values.\n")
 				pvalues <- pnorm(-res[,2])
 			}
-			res <- data.frame(categoryID=names(categories), 
-				description=categoryDescr, 
+			res <- data.frame(categoryID=as.character(names(categories)), 
+				description=as.character(categoryDescr), 
 				nGenes=res[,1],
 				zScore=res[,2], 
 				pValue=pvalues, 
