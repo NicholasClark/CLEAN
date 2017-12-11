@@ -41,7 +41,8 @@ for(i in 1:length(functionalCategories)) {
       if(is.null(names(l))) names(l) <- substr(functionalCategories[[i]], 1, nchar(functionalCategories[[i]])-6)
       CategoryID2Desc <- c(CategoryID2Desc, l)
     } else CategoryID2Desc <- c(CategoryID2Desc, list(NA))
-  } else if (functionalCategories %in% unique(c(names(getFunctionalCategories(CLEAN.Hs(), species = "Hs")),
+  } else {
+    if(functionalCategories %in% unique(c(names(getFunctionalCategories(CLEAN.Hs(), species = "Hs")),
                                            names(getFunctionalCategories(CLEAN.Mm(), species = "Mm")),
                                            names(getFunctionalCategories(CLEAN.Rn(), species = "Rn"))
                                            ))) {
@@ -101,6 +102,7 @@ for(i in 1:length(functionalCategories)) {
             warning(paste("functional categories", functionalCategories[[i]], "not found.  No functional clustering annotation generated."))
         }
     }
+  }
 ## run LRpath
 if(any(runLRpath)) {
 	LRresults <- list()
