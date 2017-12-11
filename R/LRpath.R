@@ -19,9 +19,32 @@ CategoryID2GeneID <- list()
 CategoryID2Desc <- list()
 runLRpath <- rep(TRUE, length(functionalCategories))
 for(i in 1:length(functionalCategories)) {
-    if (functionalCategories %in% unique(c(names(getFunctionalCategories(CLEAN.Hs(), species = "Hs")),
+  if(functionalCategories == "custom") {
+    e1 <- new.env()
+    #load(file = functionalCategories[[i]], envir = e1)
+    # need to have "custom2gene" and "custom2desc" in the global environment
+    assign("custom2gene", custom2gene, pos = e1)
+    assign("custom2desc", custom2desc, pos = e1)
+    if(length(ls(envir = e1, pattern = "2[G,g][E,e][N,n][E,e]")) > 0) {
+      l <- list(get(ls(envir = e1, pattern = "2[G,g][E,e][N,n][E,e]")[1], envir = e1))
+      names(l) <- names(functionalCategories)[i]
+      if(is.null(names(l))) names(l) <- substr(functionalCategories[[i]], 1, nchar(functionalCategories[[i]])-6)
+      CategoryID2GeneID <- c(CategoryID2GeneID, l)
+    } else {
+      runLRpath[i] <- FALSE
+      CategoryID2GeneID <- c(CategoryID2GeneID, list(NA))
+      warning(paste("No functional categories found in file", functionalCategories[[i]], "-  No functional clustering annotation generated."))
+    }
+    if(length(ls(envir = e1, pattern = "2[D,d][E,e][S,s][C,c]")) > 0) {
+      l <- list(get(ls(envir = e1, pattern = "2[D,d][E,e][S,s][C,c]")[1], envir = e1))
+      names(l) <- names(functionalCategories)[i]
+      if(is.null(names(l))) names(l) <- substr(functionalCategories[[i]], 1, nchar(functionalCategories[[i]])-6)
+      CategoryID2Desc <- c(CategoryID2Desc, l)
+    } else CategoryID2Desc <- c(CategoryID2Desc, list(NA))
+  } else if (functionalCategories %in% unique(c(names(getFunctionalCategories(CLEAN.Hs(), species = "Hs")),
                                            names(getFunctionalCategories(CLEAN.Mm(), species = "Mm")),
-                                           names(getFunctionalCategories(CLEAN.Rn(), species = "Rn"))))) {
+                                           names(getFunctionalCategories(CLEAN.Rn(), species = "Rn"))
+                                           ))) {
 	    if(substr(functionalCategories[[i]],nchar(functionalCategories[[i]])-4,nchar(functionalCategories[[i]])) == "RData") {
 		    e1 <- new.env()
 			load(file = functionalCategories[[i]], envir = e1)
