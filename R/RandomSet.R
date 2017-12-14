@@ -71,59 +71,83 @@ if(!is.list(functionalCategories)) functionalCategories <- as.list(unique(functi
 CategoryID2GeneID <- list()
 CategoryID2Desc <- list()
 runRS <- rep(TRUE, length(functionalCategories))
-for(i in 1:length(functionalCategories)) {
-    if (functionalCategories %in% unique(c(names(getFunctionalCategories(CLEAN.Hs(), species = "Hs")),
-                                           names(getFunctionalCategories(CLEAN.Mm(), species = "Mm")),
-                                           names(getFunctionalCategories(CLEAN.Rn(), species = "Rn"))))) {
-		if(substr(functionalCategories[[i]],nchar(functionalCategories[[i]])-4,nchar(functionalCategories[[i]])) == "RData") {
-			e1 <- new.env()
-			load(file = functionalCategories[[i]], envir = e1)
-			if(length(ls(envir = e1, pattern = "2[G,g][E,e][N,n][E,e]")) > 0) {
-				l <- list(get(ls(envir = e1, pattern = "2[G,g][E,e][N,n][E,e]")[1], envir = e1))
-				names(l) <- names(functionalCategories)[i]
-				if(is.null(names(l))) names(l) <- substr(functionalCategories[[i]], 1, nchar(functionalCategories[[i]])-6)
-				CategoryID2GeneID <- c(CategoryID2GeneID, l)
-			} else {
-				runRS[i] <- FALSE
-				CategoryID2GeneID <- c(CategoryID2GeneID, list(NA))
-				warning(paste("No functional categories found in file", functionalCategories[[i]], "-  No functional clustering annotation generated."))
-			}
-			if(length(ls(envir = e1, pattern = "2[D,d][E,e][S,s][C,c]")) > 0) {
-				l <- list(get(ls(envir = e1, pattern = "2[D,d][E,e][S,s][C,c]")[1], envir = e1))
-				names(l) <- names(functionalCategories)[i]
-				if(is.null(names(l))) names(l) <- substr(functionalCategories[[i]], 1, nchar(functionalCategories[[i]])-6)
-				CategoryID2Desc <- c(CategoryID2Desc, l)
-			} else CategoryID2Desc <- c(CategoryID2Desc, list(NA))
-		} else {
-			species <- paste(toupper(substr(species, 1, 1)), substr(species, 2, 2), sep = "")
-			l1 <- getFunctionalCategories(functionalCategories[[i]], species)
-			if(length(l1) > 0) {
-				l <- l1[[1]][1]
-				names(l) <- functionalCategories[[i]]
-				CategoryID2GeneID <- c(CategoryID2GeneID, l)
-				if(length(l1[[1]]) > 1) {
-					l <- l1[[1]][2]
-					names(l) <- functionalCategories[[i]]
-					CategoryID2Desc <- c(CategoryID2Desc, l)
-				} else CategoryID2Desc <- c(CategoryID2Desc, list(NA))
-			} else {
-				runRS[i] <- FALSE
-				CategoryID2GeneID <- c(CategoryID2GeneID, list(NA))
-				CategoryID2Desc <- c(CategoryID2Desc, list(NA))
-				warning(paste("functional categories", functionalCategories[[i]], "not found.  No functional clustering annotation generated."))
-			}
-		}
-	} else {   
-	    l1 <- get(functionalCategories[[i]])
-	        l <- l1[[1]][1]
-	        names(l) <- functionalCategories[[i]]
-	        CategoryID2GeneID <- c(CategoryID2GeneID, l)
-	        if(length(l1[[1]]) > 1) {
-	            l <- l1[[1]][2]
-	            names(l) <- functionalCategories[[i]]
-	            CategoryID2Desc <- c(CategoryID2Desc, l)
-	        } else CategoryID2Desc <- c(CategoryID2Desc, list(NA))
-	}
+if(functionalCategories == "custom") {
+  e1 <- new.env()
+  #load(file = functionalCategories[[i]], envir = e1)
+  # need to have "custom2gene" and "custom2desc" in the global environment
+  assign("custom2gene", custom2gene, pos = e1)
+  assign("custom2desc", custom2desc, pos = e1)
+  if(length(ls(envir = e1, pattern = "2[G,g][E,e][N,n][E,e]")) > 0) {
+    l <- list(get(ls(envir = e1, pattern = "2[G,g][E,e][N,n][E,e]")[1], envir = e1))
+    names(l) <- names(functionalCategories)[i]
+    if(is.null(names(l))) names(l) <- substr(functionalCategories[[i]], 1, nchar(functionalCategories[[i]])-6)
+    CategoryID2GeneID <- c(CategoryID2GeneID, l)
+  } else {
+    runRS[i] <- FALSE
+    CategoryID2GeneID <- c(CategoryID2GeneID, list(NA))
+    warning(paste("No functional categories found in file", functionalCategories[[i]], "-  No functional clustering annotation generated."))
+  }
+  if(length(ls(envir = e1, pattern = "2[D,d][E,e][S,s][C,c]")) > 0) {
+    l <- list(get(ls(envir = e1, pattern = "2[D,d][E,e][S,s][C,c]")[1], envir = e1))
+    names(l) <- names(functionalCategories)[i]
+    if(is.null(names(l))) names(l) <- substr(functionalCategories[[i]], 1, nchar(functionalCategories[[i]])-6)
+    CategoryID2Desc <- c(CategoryID2Desc, l)
+  } else CategoryID2Desc <- c(CategoryID2Desc, list(NA))
+} else {
+  for(i in 1:length(functionalCategories)) {
+      if (functionalCategories %in% unique(c(names(getFunctionalCategories(CLEAN.Hs(), species = "Hs")),
+                                             names(getFunctionalCategories(CLEAN.Mm(), species = "Mm")),
+                                             names(getFunctionalCategories(CLEAN.Rn(), species = "Rn"))))) {
+  		if(substr(functionalCategories[[i]],nchar(functionalCategories[[i]])-4,nchar(functionalCategories[[i]])) == "RData") {
+  			e1 <- new.env()
+  			load(file = functionalCategories[[i]], envir = e1)
+  			if(length(ls(envir = e1, pattern = "2[G,g][E,e][N,n][E,e]")) > 0) {
+  				l <- list(get(ls(envir = e1, pattern = "2[G,g][E,e][N,n][E,e]")[1], envir = e1))
+  				names(l) <- names(functionalCategories)[i]
+  				if(is.null(names(l))) names(l) <- substr(functionalCategories[[i]], 1, nchar(functionalCategories[[i]])-6)
+  				CategoryID2GeneID <- c(CategoryID2GeneID, l)
+  			} else {
+  				runRS[i] <- FALSE
+  				CategoryID2GeneID <- c(CategoryID2GeneID, list(NA))
+  				warning(paste("No functional categories found in file", functionalCategories[[i]], "-  No functional clustering annotation generated."))
+  			}
+  			if(length(ls(envir = e1, pattern = "2[D,d][E,e][S,s][C,c]")) > 0) {
+  				l <- list(get(ls(envir = e1, pattern = "2[D,d][E,e][S,s][C,c]")[1], envir = e1))
+  				names(l) <- names(functionalCategories)[i]
+  				if(is.null(names(l))) names(l) <- substr(functionalCategories[[i]], 1, nchar(functionalCategories[[i]])-6)
+  				CategoryID2Desc <- c(CategoryID2Desc, l)
+  			} else CategoryID2Desc <- c(CategoryID2Desc, list(NA))
+  		} else {
+  			species <- paste(toupper(substr(species, 1, 1)), substr(species, 2, 2), sep = "")
+  			l1 <- getFunctionalCategories(functionalCategories[[i]], species)
+  			if(length(l1) > 0) {
+  				l <- l1[[1]][1]
+  				names(l) <- functionalCategories[[i]]
+  				CategoryID2GeneID <- c(CategoryID2GeneID, l)
+  				if(length(l1[[1]]) > 1) {
+  					l <- l1[[1]][2]
+  					names(l) <- functionalCategories[[i]]
+  					CategoryID2Desc <- c(CategoryID2Desc, l)
+  				} else CategoryID2Desc <- c(CategoryID2Desc, list(NA))
+  			} else {
+  				runRS[i] <- FALSE
+  				CategoryID2GeneID <- c(CategoryID2GeneID, list(NA))
+  				CategoryID2Desc <- c(CategoryID2Desc, list(NA))
+  				warning(paste("functional categories", functionalCategories[[i]], "not found.  No functional clustering annotation generated."))
+  			}
+  		}
+  	} else {   
+  	    l1 <- get(functionalCategories[[i]])
+  	        l <- l1[[1]][1]
+  	        names(l) <- functionalCategories[[i]]
+  	        CategoryID2GeneID <- c(CategoryID2GeneID, l)
+  	        if(length(l1[[1]]) > 1) {
+  	            l <- l1[[1]][2]
+  	            names(l) <- functionalCategories[[i]]
+  	            CategoryID2Desc <- c(CategoryID2Desc, l)
+  	        } else CategoryID2Desc <- c(CategoryID2Desc, list(NA))
+  	}
+  }
 }
 
 ## RandomSet function (Newton et al.)
