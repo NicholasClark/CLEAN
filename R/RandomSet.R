@@ -71,6 +71,7 @@ if(!is.list(functionalCategories)) functionalCategories <- as.list(unique(functi
 CategoryID2GeneID <- list()
 CategoryID2Desc <- list()
 runRS <- rep(TRUE, length(functionalCategories))
+for(i in 1:length(functionalCategories)) {
 if(functionalCategories == "custom") {
   e1 <- new.env()
   #load(file = functionalCategories[[i]], envir = e1)
@@ -94,7 +95,6 @@ if(functionalCategories == "custom") {
     CategoryID2Desc <- c(CategoryID2Desc, l)
   } else CategoryID2Desc <- c(CategoryID2Desc, list(NA))
 } else {
-  for(i in 1:length(functionalCategories)) {
       if (functionalCategories %in% unique(c(names(getFunctionalCategories(CLEAN.Hs(), species = "Hs")),
                                              names(getFunctionalCategories(CLEAN.Mm(), species = "Mm")),
                                              names(getFunctionalCategories(CLEAN.Rn(), species = "Rn"))))) {
